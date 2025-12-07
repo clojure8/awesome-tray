@@ -347,7 +347,7 @@ If nil, don't update the awesome-tray automatically."
     text-scale-mode-hook)
   "Hook points to update the git module."
   :type '(list (hook :tag "HookPoint")
-               (repeat :inline t (hook :tag "HookPoint"))))
+          (repeat :inline t (hook :tag "HookPoint"))))
 
 (defcustom awesome-tray-separator " "
   "Default string for the separator between modules."
@@ -579,7 +579,7 @@ Example:
     ("anzu" . (awesome-tray-module-anzu-info awesome-tray-module-anzu-face))
     ("github" . (awesome-tray-module-github-info awesome-tray-module-github-face))
     ("hostname" . (awesome-tray-module-hostname-info awesome-tray-module-hostname-face))))
-    
+
 
 (with-eval-after-load 'mu4e-alert
   (add-hook 'mu4e-index-updated-hook #'mu4e-alert-update-mail-count-modeline)
@@ -768,7 +768,7 @@ Requires `anzu', also `evil-anzu' if using `evil-mode' for compatibility with
       (format "rvm:%s" (replace-regexp-in-string
                         "\n" ""
                         (nth 1 (awesome-tray-process-exit-code-and-output "rvm-prompt"))))
-              
+
     ""))
 
 (defun awesome-tray-module-battery-info ()
@@ -992,13 +992,13 @@ Requires `anzu', also `evil-anzu' if using `evil-mode' for compatibility with
                                     (awesome-tray-get-match-nodes '((class_definition name: (identifier) @x)))
                                     (awesome-tray-get-match-nodes '((class_declaration name: (identifier) @x)))
                                     (awesome-tray-get-match-nodes '((class_specifier name: (type_identifier) @x)))))
-                                    
+
                (function-nodes (append (awesome-tray-get-match-nodes '((function_definition name: (symbol) @x)))
                                        (awesome-tray-get-match-nodes '((function_definition name: (identifier) @x)))
                                        (awesome-tray-get-match-nodes '((function_declarator declarator: (identifier) @x)))
                                        (awesome-tray-get-match-nodes '((method_declaration name: (identifier) @x)))
                                        (awesome-tray-get-match-nodes '((function_declarator declarator: (field_identifier) @x)))))
-                                       
+
                which-belong-info
                which-class-info
                which-func-info)
@@ -1151,11 +1151,11 @@ Requires `anzu', also `evil-anzu' if using `evil-mode' for compatibility with
     )
   )
 
-  (defun awesome-tray-module-flycheck-info ()
-    (when  (featurep 'flycheck)
-      awesome-tray-flycheck-status-cache
-      )
+(defun awesome-tray-module-flycheck-info ()
+  (when  (featurep 'flycheck)
+    awesome-tray-flycheck-status-cache
     )
+  )
 
 (defun awesome-tray-get-match-nodes (query)
   (ignore-errors
@@ -1226,7 +1226,7 @@ If right is non nil, replace to the right"
                   (face-attribute 'mode-line-inactive :background)
                   (face-attribute 'mode-line-inactive :family)
                   (face-attribute 'mode-line-inactive :box))))
-                  
+
     (setq awesome-tray-mode-line-default-height (face-attribute 'mode-line :height))
 
     ;; Disable mode line.
@@ -1248,6 +1248,9 @@ If right is non nil, replace to the right"
       (remove-overlays (point-min) (point-max))
       (push (make-overlay (point-min) (point-max) nil nil t)
             awesome-tray-overlays)))
+
+  (set-face-attribute 'window-divider nil :foreground "#5B6268")
+  (window-divider-mode 1)
 
   ;; Start the timer to automatically update
   (when awesome-tray-update-interval
@@ -1292,9 +1295,10 @@ If right is non nil, replace to the right"
   (mapc 'delete-overlay awesome-tray-overlays)
   (setq awesome-tray-overlays nil)
 
-  ;; Remove text from Minibuf-0
-  (with-current-buffer " *Minibuf-0*"
-    (delete-region (point-min) (point-max)))
+  ;; Remove text from Minibuf-0 (safe check)
+  (when (get-buffer " *Minibuf-0*")
+    (with-current-buffer " *Minibuf-0*"
+      (delete-region (point-min) (point-max))))
 
   ;; Cancel the update timer
   (cancel-function-timers #'awesome-tray-update)
@@ -1360,6 +1364,7 @@ If right is non nil, replace to the right"
 (defun awesome-tray--minibuffer-setup ()
   "Setup the awesome-tray in the minibuffer."
   (push (make-overlay (point-max) (point-max) nil t t) awesome-tray-overlays)
+
   (overlay-put (car awesome-tray-overlays) 'priority 1)
   (awesome-tray-update))
 
